@@ -13,11 +13,13 @@ const mongoose = require('mongoose');
 require('./configs/db.config');
 
 // bind user to view - locals
+const deserializeUser = require('./configs/deserialize-user');
 const bindUserToViewLocals = require('./configs/user-locals.config');
 
 // Routers
 const indexRouter = require('./routes/index.routes');
 const authRouter = require('./routes/auth.routes');
+const postRouter = require('./routes/post.routes');
 
 const app = express();
 require('./configs/session.config')(app);
@@ -33,6 +35,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(deserializeUser);
 app.use(bindUserToViewLocals);
 
 const app_name = require('./package.json').name;
@@ -41,6 +44,7 @@ const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.
 // Routes middleware
 app.use('/', indexRouter);
 app.use('/', authRouter);
+app.use('/', postRouter);
 
 // Catch missing routes and forward to error handler
 app.use((req, res, next) => next(createError(404)));
